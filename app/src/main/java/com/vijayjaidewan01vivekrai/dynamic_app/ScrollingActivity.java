@@ -476,8 +476,9 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
                     callHttp(backUrl);
                 }
             });
-//            toolbar.setNavigationIcon(null);
-//            mToolbar.setNavigationIcon(null);
+
+            toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
+            mToolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
         }
     }
 

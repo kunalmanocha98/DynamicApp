@@ -44,8 +44,6 @@ public class CardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
         this.pos = position;
     }
 
-
-
     @Override
     public int getItemCount() {
         return filterData.size();
@@ -129,7 +127,7 @@ public class CardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
                 public void onClick(View v) {
                     if(onClickSetListener != null)
                         onClickSetListener.onClickFunction(cardData.get(position).getUrl());
-                    Toast.makeText(context,cardData.get(position).getUrl(),Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(context,cardData.get(position).getUrl(),Toast.LENGTH_SHORT).show();
                     Log.i("URL in adapter",cardData.get(position).getUrl());
                 }
             });
@@ -160,7 +158,7 @@ public class CardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
                 public void onClick(View v) {
                     if(onClickSetListener != null)
                         onClickSetListener.onClickFunction(cardData.get(position).getUrl());
-                    Toast.makeText(context,cardData.get(position).getUrl(),Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(context,cardData.get(position).getUrl(),Toast.LENGTH_SHORT).show();
                     Log.i("URL in adapter",cardData.get(position).getUrl());
                     //context.sendBroadcast(i);
                 }
@@ -197,7 +195,7 @@ public class CardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
 //                    OnClickSet set =  new ScrollingActivity();
                     if(onClickSetListener != null)
                     onClickSetListener.onClickFunction(cardData.get(position).getUrl());
-                    Toast.makeText(context,cardData.get(position).getUrl(),Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(context,cardData.get(position).getUrl(),Toast.LENGTH_SHORT).show();
 //                    Intent i=new Intent(context,ScrollingActivity.class);
 //                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 //                    i.putExtra("URL",cardData.get(position).getUrl());
@@ -338,5 +336,4 @@ public class CardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
             background = itemView.findViewById(R.id.background);
         }
     }
-
 }

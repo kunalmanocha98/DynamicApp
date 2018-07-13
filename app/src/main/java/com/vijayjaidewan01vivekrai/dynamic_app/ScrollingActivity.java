@@ -157,10 +157,6 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
     public void callHttp(final String URL) {
         BASE_URL = URL;
         if (isNetworkAvailable()) {
-            /*if (databaseHelper != null) {
-                db = databaseHelper;
-            }
-            */
             ApiService apiService = ApiUtils.getAPIService();
 
             // ADD A PROGRESS BAR TO BE SHOWN TO THE USER BEFORE THE DATA IS LOADED
@@ -418,25 +414,6 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
         }
     }
 
-    // Setting the margins of Recycler View while the toolbar is collapsed to remove the empty space in between the toolbar and recycler view
-    public void setRecyclerViewMargins() {
-        appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
-            @Override
-            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-                if (Math.abs(verticalOffset) == appBarLayout.getTotalScrollRange()) {
-                    //Log.d("appbar",""+recyclerView.getScaleY());
-                    CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) swipeRefreshLayout.getLayoutParams(); // Redundant Code with line 119
-                    layoutParams.setMargins(0, 0, 0, 0);
-                    swipeRefreshLayout.setLayoutParams(layoutParams);
-                } else if (Math.abs(verticalOffset) == 0) {
-                    CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) swipeRefreshLayout.getLayoutParams();
-                    layoutParams.setMargins(0, 150, 0, 0);
-                    swipeRefreshLayout.setLayoutParams(layoutParams);
-                }
-            }
-        });
-    }
-
     private void setNavigation(int drawerValue) {
         if (drawerValue == 0) {
             backUrl = null;
@@ -575,6 +552,6 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
     }
 
     public interface SetLayout {
-        void setUrl(String url, DatabaseHelper db);
+        void setUrl(String url);
     }
 }

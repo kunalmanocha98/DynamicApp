@@ -36,7 +36,6 @@ public class CardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
     private int TWO = 2;
     private int THREE = 3;
     private int FOUR = 4;
-    DatabaseHelper db = null;
     public CardAdapter(ArrayList<Data> cardData,ArrayList<Data> list, Context context, int position) {
         this.cardData = cardData;
         this.filterData = list;
@@ -95,7 +94,7 @@ public class CardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
 
                     if(onClickSetListener != null)
                         onClickSetListener.onClickFunction(cardData.get(position).getUrl());
-                    Toast.makeText(context,cardData.get(position).getUrl(),Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(context,cardData.get(position).getUrl(),Toast.LENGTH_SHORT).show();
                     Log.i("URL in adapter",cardData.get(position).getUrl());
                 }
             });
@@ -160,12 +159,9 @@ public class CardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
                         onClickSetListener.onClickFunction(cardData.get(position).getUrl());
 //                    Toast.makeText(context,cardData.get(position).getUrl(),Toast.LENGTH_SHORT).show();
                     Log.i("URL in adapter",cardData.get(position).getUrl());
-                    //context.sendBroadcast(i);
                 }
             });
 
-
-            //((ViewHolder3)holder).iconImage.setImageBitmap(CardAdapter.getImage(cardData.get(position).getImage()));
         }
         if (holder instanceof ViewHolder4) {
             ((ViewHolder4) holder).head.setText(cardData.get(position).getText1());
@@ -180,18 +176,15 @@ public class CardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
             ((ViewHolder4) holder).desc.setTextColor(Color.parseColor(cardData.get(position).getText_description_color()));
             ((ViewHolder4) holder).desc.setTextSize(TypedValue.COMPLEX_UNIT_SP,Float.parseFloat(cardData.get(position).getText_description_size()));
 
-//            ((ViewHolder4) holder).card.setCardBackgroundColor(Color.parseColor(cardData.get(position).getBg_color()));
             Glide.with(context)
                     .load(cardData.get(position).getImage())
                     .placeholder(R.drawable.grey)
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(((ViewHolder4) holder).background);
 
-            //View.OnClickListener listener = new ScrollingActivity();
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
 //                    OnClickSet set =  new ScrollingActivity();
                     if(onClickSetListener != null)
                     onClickSetListener.onClickFunction(cardData.get(position).getUrl());
@@ -254,10 +247,8 @@ public class CardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
                             filteredList.add(i);
                         }
                     }
-
                     filterData = filteredList;
                 }
-
                 FilterResults filterResults = new FilterResults();
                 filterResults.values = filterData;
                 return filterResults;

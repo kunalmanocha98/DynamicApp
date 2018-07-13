@@ -101,7 +101,7 @@ public class LoginFragment extends Fragment implements ScrollingActivity.SetLayo
     }
 
     @Override
-    public void setUrl(String url, DatabaseHelper db) {
+    public void setUrl(String url) {
         ((ScrollingActivity)getActivity()).callHttp(url);
     }
 
@@ -132,9 +132,13 @@ public class LoginFragment extends Fragment implements ScrollingActivity.SetLayo
             call.enqueue(new Callback<TestResults>() {
                 @Override
                 public void onResponse(Call<TestResults> call, Response<TestResults> response) {
-                    Log.i("IN response","yes");
-                    Toast.makeText(getContext(),response.body().getCode(),Toast.LENGTH_LONG).show();
-                    setUrl(response.body().getResults().getUrl(),db);
+                    if (response.body().getMsg().equalsIgnoreCase("success")) {
+                        Toast.makeText(getContext(), "Login Successful", Toast.LENGTH_SHORT).show();
+                        relativeLayout.animate().translationYBy(-2000f).setDuration(300).alphaBy(1f);
+                        setUrl(response.body().getResults().getUrl());
+                    } else {
+                        Toast.makeText(getContext(), "Credentials doesn't match", Toast.LENGTH_SHORT).show();
+                    }
                 }
 
                 @Override

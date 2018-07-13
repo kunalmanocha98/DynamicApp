@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,8 +51,9 @@ public class NavDrawerCardAdapter extends RecyclerView.Adapter<RecyclerView.View
                 if (onClickSetListener != null) {
 //                    db = new DatabaseHelper(context,items.get(position).getUrl(),null,1);
                     onClickSetListener.onClickFunction(items.get(position).getUrl());
-                }Toast.makeText(context, items.get(position).getUrl(), Toast.LENGTH_SHORT).show();
-//                Log.i("URL in adapter", items.get(position).getUrl());
+                }
+//                Toast.makeText(context, items.get(position).getUrl(), Toast.LENGTH_SHORT).show();
+                Log.i("URL in adapter", items.get(position).getUrl());
             }
         });
     }

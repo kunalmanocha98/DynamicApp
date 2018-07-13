@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/CollapsingToolbar_github.iml" filepath="$PROJECT_DIR$/CollapsingToolbar_github.iml" />
+      <module fileurl="file://$PROJECT_DIR$/DynamicApp.iml" filepath="$PROJECT_DIR$/DynamicApp.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

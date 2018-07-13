@@ -22,7 +22,6 @@ import java.util.ArrayList;
 public class NavDrawerCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
    private ArrayList<Menu_items> items;
    private Context context;
-   DatabaseHelper db;
 
     public NavDrawerCardAdapter(ArrayList<Menu_items> items, Context context) {
         this.items = items;
@@ -49,8 +48,8 @@ public class NavDrawerCardAdapter extends RecyclerView.Adapter<RecyclerView.View
             @Override
             public void onClick(View v) {
                 if (onClickSetListener != null) {
-                    db = new DatabaseHelper(context,items.get(position).getUrl(),null,1);
-                    onClickSetListener.onClickFunction(items.get(position).getUrl(), db);
+//                    db = new DatabaseHelper(context,items.get(position).getUrl(),null,1);
+                    onClickSetListener.onClickFunction(items.get(position).getUrl());
                 }Toast.makeText(context, items.get(position).getUrl(), Toast.LENGTH_SHORT).show();
 //                Log.i("URL in adapter", items.get(position).getUrl());
             }

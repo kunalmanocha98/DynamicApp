@@ -18,8 +18,10 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.google.gson.Gson;
 import com.vijayjaidewan01vivekrai.dynamic_app.Adapters.NavDrawerCardAdapter;
 import com.vijayjaidewan01vivekrai.dynamic_app.Models.NavDrawer;
+import com.vijayjaidewan01vivekrai.dynamic_app.Models.TableRecord;
 import com.vijayjaidewan01vivekrai.dynamic_app.Models.TestResults;
 import com.vijayjaidewan01vivekrai.dynamic_app.Okhttpclient.ApiService;
 import com.vijayjaidewan01vivekrai.dynamic_app.Okhttpclient.ApiUtils;
@@ -63,11 +65,11 @@ public class SetNavDrawer {
                 @Override
                 public void onResponse(Call<TestResults> call, Response<TestResults> response) {
                     if (response.isSuccessful()) {
+                        TableRecord record = new TableRecord(url);
+                        record.setData(new Gson().toJson(response.body()));
+                        db.addRecord(record);
                         navDrawer = response.body().getResults().getNavDrawer();
-//                        db.drop();
-//                        db.saveMenu(navDrawer.getMenu_items());
-//                        db.saveHeaderTitle(navDrawer.getHeader_layout());
-                        navigationView.setBackgroundColor(Color.parseColor(navDrawer.getNav_drawer_bg_color()));
+//                        navigationView.setBackgroundColor(Color.parseColor(navDrawer.getNav_drawer_bg_color()));
                         setDrawer();
                     }
                 }
@@ -80,11 +82,13 @@ public class SetNavDrawer {
         }
      else if(conMgr.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() ==NetworkInfo.State.DISCONNECTED
                 ||conMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() ==NetworkInfo.State.DISCONNECTED){
-//        navDrawer.setMenu_items(db.readMenu());
-//        navDrawer.setHeader_layout(db.readTitle());
-        setDrawer();
+            TableRecord record = new TableRecord(url);
+            db.getRecord(record);
+            TestResults results = new Gson().fromJson(record.getData(),TestResults.class);
+            navDrawer = results.getResults().getNavDrawer();
+//            navigationView.setBackgroundColor(Color.parseColor(navDrawer.getNav_drawer_bg_color()));
+            setDrawer();
     }
-
 }
 
 public void setDrawer()
@@ -119,7 +123,7 @@ public void setDrawer()
     cardAdapter.notifyDataSetChanged();
     cardAdapter.setClickListener((OnClickSet) context);
 
-//    navigationView.setBackgroundColor(Color.parseColor(navDrawer.getNav_drawer_bg_color()));
+    navigationView.setBackgroundColor(Color.parseColor(navDrawer.getNav_drawer_bg_color()));
 }
     private OnClickSet onClickSetListener;
 

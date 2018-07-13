@@ -102,7 +102,7 @@ public class LoginFragment extends Fragment implements ScrollingActivity.SetLayo
 
     @Override
     public void setUrl(String url, DatabaseHelper db) {
-        ((ScrollingActivity)getActivity()).callHttp(url,db);
+        ((ScrollingActivity)getActivity()).callHttp(url);
     }
 
     class UserLoginTask extends AsyncTask<Void, Void, Boolean >

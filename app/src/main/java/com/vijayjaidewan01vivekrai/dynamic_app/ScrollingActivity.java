@@ -10,7 +10,6 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
@@ -38,11 +37,13 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
+import com.google.gson.Gson;
 import com.vijayjaidewan01vivekrai.collapsingtoolbar_github.R;
 import com.vijayjaidewan01vivekrai.dynamic_app.Adapters.CardAdapter;
 import com.vijayjaidewan01vivekrai.dynamic_app.Models.Data;
 import com.vijayjaidewan01vivekrai.dynamic_app.Models.Login;
 import com.vijayjaidewan01vivekrai.dynamic_app.Models.Results;
+import com.vijayjaidewan01vivekrai.dynamic_app.Models.TableRecord;
 import com.vijayjaidewan01vivekrai.dynamic_app.Models.TestResults;
 import com.vijayjaidewan01vivekrai.dynamic_app.Okhttpclient.ApiService;
 import com.vijayjaidewan01vivekrai.dynamic_app.Okhttpclient.ApiUtils;
@@ -108,7 +109,7 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
             // notify user you are online
             //requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
             setProgressBarIndeterminate(true);
-            callHttp(BASE_URL, db);
+            callHttp(BASE_URL);
             setProgressBarIndeterminate(false);
 
         } else {
@@ -116,9 +117,17 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
             progressBar.clearFocus();
             progressBar.setVisibility(View.GONE);
 
-//            Results results = setValues(db);
-
-//            setView(results);
+            TableRecord record = new TableRecord(BASE_URL);
+            db.getRecord(record);
+            if(record.getData() == null)
+            {
+                offlineFragment();
+            }
+            else
+            {
+                    TestResults results = new Gson().fromJson(record.getData(),TestResults.class);
+                    setView(results.getResults());
+            }
         }
     }
 
@@ -145,12 +154,13 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
         ft.commit();
     }
 
-    public void callHttp(String URL, DatabaseHelper databaseHelper) {
+    public void callHttp(final String URL) {
         BASE_URL = URL;
         if (isNetworkAvailable()) {
-            if (databaseHelper != null) {
+            /*if (databaseHelper != null) {
                 db = databaseHelper;
             }
+            */
             ApiService apiService = ApiUtils.getAPIService();
 
             // ADD A PROGRESS BAR TO BE SHOWN TO THE USER BEFORE THE DATA IS LOADED
@@ -171,12 +181,12 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
                             progressBar.clearFocus();
                             progressBar.setVisibility(View.GONE);
 
+                            Log.d("messageJSON",new Gson().toJson(response.body()));
+
                             Results results = response.body().getResults();
-                            //Saving values to the database
-//                            db.dropTable();
-//                            db.saveData(results.getData());
-//                            db.saveToolbar(results.getToolBar());
-//                            db.saveView(results);
+                            TableRecord record = new TableRecord(URL);
+                            record.setData(new Gson().toJson(response.body()));
+                            db.addRecord(record);
 
                             setView(results);
                         } else {
@@ -192,12 +202,26 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
                 }
             });
         } else {
-            if (databaseHelper != null) {
-//                Results results = setValues(databaseHelper);
-//                setView(results);
-            } else {
+            mArrayList.clear();
+            TableRecord record = new TableRecord(BASE_URL);
+            db.getRecord(record);
+            if(record.getData() == null)
+            {
                 offlineFragment();
             }
+            else
+            {
+                TestResults results = new Gson().fromJson(record.getData(),TestResults.class);
+                setView(results.getResults());
+            }
+
+//            if (databaseHelper != null) {
+////                Results results = setValues(databaseHelper);
+////                setView(results);
+//            }
+//            else {
+//                offlineFragment();
+//            }
         }
     }
 
@@ -357,7 +381,7 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                callHttp(BASE_URL, db);
+                callHttp(BASE_URL);
                 swipeRefreshLayout.setRefreshing(false);
             }
         });
@@ -442,14 +466,14 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
                 @Override
                 public void onClick(View v) {
                     Toast.makeText(getApplicationContext(), backUrl, Toast.LENGTH_SHORT).show();
-                    callHttp(backUrl, db);
+                    callHttp(backUrl);
                 }
             });
             toolbar.setNavigationOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Toast.makeText(getApplicationContext(), backUrl, Toast.LENGTH_SHORT).show();
-                    callHttp(backUrl, db);
+                    callHttp(backUrl);
                 }
             });
 //            toolbar.setNavigationIcon(null);
@@ -480,15 +504,15 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
                 super.onBackPressed();
             else {
                 Toast.makeText(getApplicationContext(), backUrl, Toast.LENGTH_SHORT).show();
-                callHttp(backUrl, db);
+                callHttp(backUrl);
             }
         }
     }
 
     @Override
-    public void onClickFunction(String url, DatabaseHelper databaseHelper) {
+    public void onClickFunction(String url) {
         drawerLayout.closeDrawers();
-        callHttp(url, databaseHelper);
+        callHttp(url);
         Log.i("IN Scrolling", url);
     }
 

@@ -22,11 +22,13 @@ public class RetrofitClient {
 
     public static Retrofit getClient(){
 
-        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();          //To be removed before finalising the app
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);                    //To be removed before finalising the app
 
-        OkHttpClient.Builder httpClient = new OkHttpClient.Builder().connectTimeout(100, TimeUnit.SECONDS).readTimeout(100,TimeUnit.SECONDS);
-        httpClient.addInterceptor(logging);
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder()
+                                                            .connectTimeout(100, TimeUnit.SECONDS)
+                                                            .readTimeout(100,TimeUnit.SECONDS);
+        httpClient.addInterceptor(logging);                                     //To be removed before finalising the app
 
         if (retrofit==null){
             retrofit = new Retrofit.Builder()

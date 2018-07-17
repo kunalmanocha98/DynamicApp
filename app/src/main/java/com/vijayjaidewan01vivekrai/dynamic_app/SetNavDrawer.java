@@ -46,6 +46,12 @@ public class SetNavDrawer {
         this.url = url;
     }
 
+    /**
+     *
+     * @param view - gets the navigation view from the constructor
+     * @param context - gets the context of the ScrollingActivity (Because it is the single acitivity in our project)
+     * @param db - database helper instance is passed from the Scrolling activity
+     */
     public SetNavDrawer(LinearLayout view, Context context, DatabaseHelper db) {
         navigationView = view;
         this.context = context;
@@ -53,23 +59,33 @@ public class SetNavDrawer {
         navDrawer = new NavDrawer();
     }
 
+    // -------------------------------------------------- getJSON() - this function fetches the data from the Internet if the client is online or from the database if it is offline --------------
     public void getJSON() {
+        /**
+         *
+         * @param recyclerView - the navigation drawer is set with the recycler view, so that it can be completely dynamic and more designs and flexibility can be added to it
+         * @param navHeaderImage - this displays the header image of the navigation drawer
+         * @param navHeaderText - this is the text to be displayed on the Header Image
+         */
         recyclerView = navigationView.findViewById(R.id.recycler_view_nav);
         navHeaderImage = navigationView.findViewById(R.id.nav_header_image);
         navHeaderText = navigationView.findViewById(R.id.nav_header_text);
-        ConnectivityManager conMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (conMgr.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED
-                || conMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
+
+        if (isNetworkAvailable()) {
+
             ApiService apiService = ApiUtils.getAPIService();
             apiService.results(url).enqueue(new Callback<TestResults>() {
                 @Override
                 public void onResponse(Call<TestResults> call, Response<TestResults> response) {
                     if (response.isSuccessful()) {
+
+                        //DATA RECEIVED FROM THE URL WILL BE SAVED IN THE DATABASE
                         TableRecord record = new TableRecord(url);
                         record.setData(new Gson().toJson(response.body()));
                         db.addRecord(record);
+
+                        //THE response WILL BE PARSED TO GET THE navDrawer DATA IN ITS MODEL CLASS
                         navDrawer = response.body().getResults().getNavDrawer();
-//                        navigationView.setBackgroundColor(Color.parseColor(navDrawer.getNav_drawer_bg_color()));
                         setDrawer();
                     }
                 }
@@ -79,230 +95,51 @@ public class SetNavDrawer {
                     Log.e("URL error", t.getLocalizedMessage());
                 }
             });
-        }
-     else if(conMgr.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() ==NetworkInfo.State.DISCONNECTED
-                ||conMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() ==NetworkInfo.State.DISCONNECTED){
+        } else {
+
+            //DATA FETCHED FROM THE DATABASE AGAINST THE URL
             TableRecord record = new TableRecord(url);
             db.getRecord(record);
-            TestResults results = new Gson().fromJson(record.getData(),TestResults.class);
+            TestResults results = new Gson().fromJson(record.getData(), TestResults.class);
+
             navDrawer = results.getResults().getNavDrawer();
-//            navigationView.setBackgroundColor(Color.parseColor(navDrawer.getNav_drawer_bg_color()));
             setDrawer();
+        }
+
+//        setDrawer();
+    }
+
+    // -------------------------------------------------- setDrawer() - this function will set all the values of the navigation drawer -----------------------------------------------------------
+    public void setDrawer() {
+
+        navHeaderText.setText(navDrawer.getHeader_layout().getText());
+
+        Glide.with(context)
+                .load(navDrawer.getHeader_layout().getImage())
+                .placeholder(R.drawable.grey)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .into(navHeaderImage);
+
+        //HERE RECYCLER VIEW IS SET, AND AN ADAPTER IS ATTACHED TO IT.
+        //HERE YOU CAN APPLY DIFFERENT DESIGNS AS WE APPLIED IN THE SCROLLING ACTIVITY FOR MAIN RECYCLER VIEW TO DISPLAY THE DATA
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(context));
+        NavDrawerCardAdapter cardAdapter = new NavDrawerCardAdapter(navDrawer.getMenu_items(), context);
+        recyclerView.setAdapter(cardAdapter);
+        cardAdapter.notifyDataSetChanged();
+        cardAdapter.setClickListener((OnClickSet) context);                 // This will set the onClickListener for the items in the menu
+
+        navigationView.setBackgroundColor(Color.parseColor(navDrawer.getNav_drawer_bg_color()));
+    }
+
+    // -------------------------------------------------- is Network Available - function to check the internet connectivity ----------------------------------------------------------------------
+    private boolean isNetworkAvailable() {
+        ConnectivityManager manager = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = manager.getActiveNetworkInfo();
+        boolean isAvailable = false;
+        if (networkInfo != null && networkInfo.isConnected()) {
+            isAvailable = true;
+        }
+        return isAvailable;
     }
 }
-
-public void setDrawer()
-{
-    Glide.with(context)
-            .load(navDrawer.getHeader_layout().getImage())
-            .asBitmap()
-            .placeholder(R.drawable.grey)
-            .diskCacheStrategy(DiskCacheStrategy.ALL)
-            .into(new SimpleTarget<Bitmap>(200, 200) {
-                @Override
-                public void onLoadStarted(Drawable placeholder) {
-                    super.onLoadStarted(placeholder);
-                }
-
-                @Override
-                public void onLoadFailed(Exception e, Drawable errorDrawable) {
-                    super.onLoadFailed(e, errorDrawable);
-                }
-
-                @Override
-                public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                    navHeaderImage.setImageBitmap(resource);
-                }
-            });
-
-    recyclerView.setHasFixedSize(true);
-    recyclerView.setLayoutManager(new LinearLayoutManager(context));
-    navHeaderText.setText(navDrawer.getHeader_layout().getText());
-    NavDrawerCardAdapter cardAdapter = new NavDrawerCardAdapter(navDrawer.getMenu_items(), context);
-    recyclerView.setAdapter(cardAdapter);
-    cardAdapter.notifyDataSetChanged();
-    cardAdapter.setClickListener((OnClickSet) context);
-
-    navigationView.setBackgroundColor(Color.parseColor(navDrawer.getNav_drawer_bg_color()));
-}
-    private OnClickSet onClickSetListener;
-
-    public void setClickListener(OnClickSet onClickSet) {
-        this.onClickSetListener = onClickSet;
-    }
-}
-
-//                    new DownloadImage().execute();
-//                    DatabaseHelper databaseHelper = new DatabaseHelper(context,"Toolbar",null,1);
-
-// notify user you are online
-//requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-
-//navigationView = view.findViewById(R.id.nav_view);
-//        Log.d("Header Count", "" + navigationView.getHeaderCount());
-
-//                      menu.add("Menu");
-
-//                    Log.d("Menu item 1",""+menu.getItem(0));
-
-//                      ArrayList<Bitmap> bm = downloadImage();
-
-                   /* navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-                        @Override
-                        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                            Log.d("Clicked item", "" + (item.getItemId()));
-//                            item.setCheckable(true);
-                            item.setChecked(true);
-//                            item.setEnabled(true);
-                            if (onClickSetListener != null)
-                                onClickSetListener.onClickFunction(navDrawer.getMenu_items().get(item.getItemId() - 1).getUrl());
-                            //context.startActivity(new Intent(context,ScrollingActivity.class));
-                            //Toast.makeText(context,item.getTitle() + " : " + navDrawer.getMenu_items().get(item.getItemId()).getUrl(),Toast.LENGTH_SHORT).show();
-                            return true;
-                        }
-                    });
-*/
-//                    NavigationView.OnNavigationItemSelectedListener clickListener = new ScrollingActivity();
-//                    clickListener.onNavigationItemSelected(navigationView.getMenu().getItem());
-//menu.add(R.id.group1,R.id.item1,Menu.NONE,response.body().getResults().getNavDrawer().getMenu_items().get())
-
-//        menu = navigationView.getMenu();
-//        menu.clear();
-
-
-/*  public void addBitmapToMemoryCache(String key, Bitmap bitmap) {
-        if (getBitmapFromMemCache(key) == null) {
-            mMemoryCache.put(key, bitmap);
-        }
-    }
-
-    public Bitmap getBitmapFromMemCache(String key) {
-        return mMemoryCache.get(key);
-    }
-*/
-
-    /*public ArrayList<Bitmap> downloadImage()
-    {
-        final ArrayList <Bitmap> bm= new ArrayList<>();
-        for(Menu_items items : navDrawer.getMenu_items()) {
-            Glide.with(context)
-                    .load(items.getIcon())
-                    .asBitmap()
-                    .into(new SimpleTarget<Bitmap>(50, 50) {
-                        @Override
-                        public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                           bm.add(resource);
-                        }
-                    });
-        }
-        return bm;
-    }*/
-
-    /*class DownloadImage extends AsyncTask<Void, Void, Void> {
-        ArrayList<Bitmap> bm = new ArrayList<>();
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            for (Menu_items items : navDrawer.getMenu_items()) {
-                try {
-                    URL url = new URL(items.getIcon());
-                    HttpURLConnection connection = null;
-                    connection = (HttpURLConnection) url.openConnection();
-                    connection.setDoInput(true);
-                    connection.connect();
-                    InputStream input = connection.getInputStream();
-                    bitmap = BitmapFactory.decodeStream(input);
-
-//                    Matrix matrix = new Matrix();
-//                    matrix.postScale(30,30);
-//                    bitmap = Bitmap.createBitmap(bitmap,0,0,50,50);
-                    bm.add(bitmap);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                        *//*Glide.with(context)
-                                .load(items.getIcon())
-                                .asBitmap()
-                                .into(new SimpleTarget<Bitmap>(50,50) {
-                                    @Override
-                                    public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                                     bitmap = resource;
-                                     setbitmap();
-                                    }
-                                });*//*
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            i = Menu.FIRST - 1;
-            while (i < navDrawer.getMenu_items().size()) {
-                items = navDrawer.getMenu_items().get(i);
-                Log.d("Nav Drawer", "Yes");
-
-                Drawable drawable = new BitmapDrawable(context.getResources(), bm.get(i));
-
-                menu.add(0, (Menu.FIRST + i), Menu.NONE, items.getItem()).setIcon(drawable);
-                i++;
-            }
-        }
-    }
-}*/
-
-//                            .asBitmap()
-//                            .listener(new RequestListener<String, Bitmap>() {
-//                                @Override
-//                                public boolean onException(Exception e, String model, Target<Bitmap> target, boolean isFirstResource) {
-//                                    return false;
-//                                }
-//
-//                                @Override
-//                                public boolean onResourceReady(Bitmap resource, String model, Target<Bitmap> target, boolean isFromMemoryCache, boolean isFirstResource) {
-//                                    Log.d("in listener",model);
-//                                    bitmap = resource;
-//                                    return true;
-//                                }
-//
-
-
-//                        try {
-//                            Bitmap bitmap = Glide.with(context)
-//                                                            .load(items.getUrl())
-//                                                            .asBitmap()
-//                                                            .into(50,50)
-//                                                            .get();
-//                        } catch (InterruptedException e) {
-//                            e.printStackTrace();
-//                        } catch (ExecutionException e) {
-//                            e.printStackTrace();
-//                        }
-
-
-//                        Bitmap bm = null;
-//                        ApiService apiService1 = ApiUtils.getAPIService();
-//                        Call call1 = apiService1.results(url);
-//                        try {
-//                            Response<ResponseBody> response1 = call1.execute();
-//                            bm = BitmapFactory.decodeStream(response1.body().byteStream());
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
-
-                        /*InputStream iStream = null;
-                        try {
-                            iStream = (InputStream) new URL(url).getContent();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        Drawable drawable = Drawable.createFromStream(iStream,"icon");*/
-//                            Drawable drawable = BitmapFactory.decodeStream((InputStream) u.getContent());
-
-
-//    NavigationView view = findViewById(R.id.nav_view);
-//                        view.setNavigationItemSelectedListener(ScrollingActivity.this);
-//                                View head = view.getHeaderView(0);
-//                                AppCompatImageView image = head.findViewById(R.id.nav_header_image);
-

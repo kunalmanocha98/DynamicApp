@@ -1,5 +1,6 @@
 package com.vijayjaidewan01vivekrai.dynamic_app;
 
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -37,7 +38,6 @@ public class LoginFragment extends Fragment implements ScrollingActivity.SetLayo
     AppCompatImageView imageView,backImage;
     String url;
     Login login;
-    DatabaseHelper db = null;
 
     @Nullable
     @Override
@@ -45,6 +45,16 @@ public class LoginFragment extends Fragment implements ScrollingActivity.SetLayo
         super.onCreateView(inflater, container, savedInstanceState);
         final View view = inflater.inflate(R.layout.login_fragment,container,false);
 
+        /**
+         * @param username - EditText, to take input from the input_box1
+         * @param password - EditText, to take input from the input_box2
+         * @param card - Card, containing both the input boxes
+         * @param relativeLayout - it denotes the whole layout of the fragment
+         * @param imageView - it will display the profile image that we will get from the url
+         * @param button - the login button which will start the action of the fragment
+         * @param backImage - it will display the background image that we will get from the url
+         * @param login - it is Model Class object that stores the value of all the attributes
+         */
         username = view.findViewById(R.id.login_username);
         password = view.findViewById(R.id.login_password);
         card = view.findViewById(R.id.login_card);
@@ -54,27 +64,29 @@ public class LoginFragment extends Fragment implements ScrollingActivity.SetLayo
         backImage = view.findViewById(R.id.loginBackImage);
         login = (Login)getArguments().getSerializable("Login");
 
-
+        // ALL THE VALUES ARE SET HERE
         username.setHint(login.getInput_box1());
         password.setHint(login.getInput_box2());
-//            fragment.card.setCardBackgroundColor(Color.parseColor(login.getCard_bg_color()));
+        button.setText(login.getButton_text());
+
         Glide.with(this)
                 .load(login.getProfile_image())
                 .into(imageView);
         Glide.with(this)
                 .load(login.getBackground_image())
                 .into(backImage);
-//            fragment.password.setHighlightColor(Color.parseColor(login.getEdit_text_bg()));
-//            fragment.username.setHighlightColor(Color.parseColor(login.getEdit_text_bg()));
-//            fragment.relativeLayout.setBackgroundColor(Color.parseColor(login.getActivity_bg_color()));
-//            fragment.button.setBackgroundColor(Color.parseColor(login.getButton_bg_color()));
-//            fragment.button.setTextColor(Color.parseColor(login.getButton_text_color()));
-        button.setText(login.getButton_text());
+
+        card.setCardBackgroundColor(Color.parseColor(login.getCard_bg_color()));
+        password.setHighlightColor(Color.parseColor(login.getEdit_text_bg()));
+        username.setHighlightColor(Color.parseColor(login.getEdit_text_bg()));
+        relativeLayout.setBackgroundColor(Color.parseColor(login.getActivity_bg_color()));
+        button.setBackgroundColor(Color.parseColor(login.getButton_bg_color()));
+        button.setTextColor(Color.parseColor(login.getButton_text_color()));
+
         card.setAlpha(Float.parseFloat(login.getAlpha()));
+
         url = login.getLogin_url();
-//        url = getArguments().getString("Login_url");
-        //url = "http://bydegreestest.agnitioworld.com/test"
-        ScrollingActivity instance = new ScrollingActivity();
+
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -85,25 +97,26 @@ public class LoginFragment extends Fragment implements ScrollingActivity.SetLayo
                 //check the parameters to login
                 if(!box1.isEmpty() && !box2.isEmpty())
                 {
+                    //START A BACKGROUND TASK AS SOON AS IT RECEIVES THE VALUES OF THE INPUT BOXES
                     UserLoginTask task = new UserLoginTask(box1,box2);
                     task.execute();
-                    relativeLayout.animate().translationYBy(-2000f).setDuration(300).alphaBy(1f);
-                    //startActivity(intent);
                 }
                 else
                 {
                     Toast.makeText(getContext(),"Fields cannot be empty",Toast.LENGTH_SHORT).show();
                 }
-
             }
         });
+
         return view;
     }
 
+    // -------------------------------------------------- set Url function - function of SetLayout Interface to invoke the callHttp() -------------------------------------------------------------
     @Override
     public void setUrl(String url) {
         ((ScrollingActivity)getActivity()).callHttp(url);
     }
+
 
     class UserLoginTask extends AsyncTask<Void, Void, Boolean >
     {
@@ -115,29 +128,33 @@ public class LoginFragment extends Fragment implements ScrollingActivity.SetLayo
             this.password = password;
         }
 
+        // ---------------------------------------------- doInBackground function - it will post the data on the api and check the credentials if they are correct or not -------------------------
         @Override
         protected Boolean doInBackground(Void... voids) {
 
             ApiService apiService = ApiUtils.getAPIService();
 
-            //apiService.results(url).enqueue();
-//            User user = new User();
-//            user.setInput_box1(username);
-//            user.setInput_box2(password);
             HashMap<String,String> map=new HashMap<>();
             map.put("input_box1",username);
             map.put("input_box2",password);
-//            Call<TestResults> call = apiService.getUser(new User(username,password));
+
             Call<TestResults> call=apiService.getUser(url, map);
             call.enqueue(new Callback<TestResults>() {
                 @Override
                 public void onResponse(Call<TestResults> call, Response<TestResults> response) {
-                    if (response.body().getMsg().equalsIgnoreCase("success")) {
-                        Toast.makeText(getContext(), "Login Successful", Toast.LENGTH_SHORT).show();
-                        relativeLayout.animate().translationYBy(-2000f).setDuration(300).alphaBy(1f);
-                        setUrl(response.body().getResults().getUrl());
-                    } else {
-                        Toast.makeText(getContext(), "Credentials doesn't match", Toast.LENGTH_SHORT).show();
+                    if(response.isSuccessful()) {
+
+                        // IF LOGIN IS SUCCESFUL THEN IN THE BODY WE WILL RECEIVE A MESSAGE = SUCCESS
+                        if (response.body().getMsg().equalsIgnoreCase("success")) {
+
+                            Toast.makeText(getContext(), "Login Successful", Toast.LENGTH_SHORT).show();
+
+                            //ANIMATE THE LAYOUT TO MOVE UPWARD IF THE LOGIN IS SUCCESSFUL
+                            relativeLayout.animate().translationYBy(-2000f).setDuration(300).alphaBy(1f);
+                            setUrl(response.body().getResults().getUrl());
+                        } else {
+                            Toast.makeText(getContext(), "Credentials doesn't match", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 }
 
@@ -148,16 +165,6 @@ public class LoginFragment extends Fragment implements ScrollingActivity.SetLayo
                 }
             });
 
-//            try {
-//                Response<TestResults> response = call.execute();
-//                if(response.isSuccessful())
-//                {
-//                    Toast.makeText(getContext(),response.body().getCode(),Toast.LENGTH_LONG).show();
-//                    return true;
-//                }
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
             return false;
         }
     }

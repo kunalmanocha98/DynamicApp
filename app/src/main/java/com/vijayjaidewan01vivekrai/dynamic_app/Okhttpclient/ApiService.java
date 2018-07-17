@@ -11,6 +11,9 @@ import retrofit2.http.POST;
 import retrofit2.http.Url;
 
 public interface ApiService {
+
+    //HERE NOTHING IS PASSED IN THE @GET BECAUSE WE ARE USING DYNAMIC URL
+    //SO WE HAVE DIRECTLY PASSED THE URL IN THE FUNCTION, THIS WILL OVERRIDE THE BASE URL
     @GET
     Call<TestResults> results(@Url String url);
 

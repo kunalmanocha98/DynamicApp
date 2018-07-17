@@ -36,6 +36,14 @@ public class CardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
     private int TWO = 2;
     private int THREE = 3;
     private int FOUR = 4;
+
+    /**
+     *
+     * @param cardData - this contains the data to be displayed in the recycler view
+     * @param list - it is same as cardData, it used to store the result of the search
+     * @param context - Scrolling Activity context
+     * @param position - position of the card, on which action is performed
+     */
     public CardAdapter(ArrayList<Data> cardData,ArrayList<Data> list, Context context, int position) {
         this.cardData = cardData;
         this.filterData = list;
@@ -73,6 +81,8 @@ public class CardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
         }
     }
 
+    //IN THIS FUNCTION, EVERY VIEWHOLDER IS SEPARATED AND THEN THE DATA IS ASSIGNED TO IT
+    // WHEN CARDS WILL INCREASE, EACH CARD WILL INCREASE A VIEWHOLDER
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         if (holder instanceof ViewHolder1) {
@@ -94,7 +104,6 @@ public class CardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
 
                     if(onClickSetListener != null)
                         onClickSetListener.onClickFunction(cardData.get(position).getUrl());
-//                    Toast.makeText(context,cardData.get(position).getUrl(),Toast.LENGTH_SHORT).show();
                     Log.i("URL in adapter",cardData.get(position).getUrl());
                 }
             });
@@ -185,20 +194,11 @@ public class CardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-//                    OnClickSet set =  new ScrollingActivity();
                     if(onClickSetListener != null)
                     onClickSetListener.onClickFunction(cardData.get(position).getUrl());
-//                    Toast.makeText(context,cardData.get(position).getUrl(),Toast.LENGTH_SHORT).show();
-//                    Intent i=new Intent(context,ScrollingActivity.class);
-//                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//                    i.putExtra("URL",cardData.get(position).getUrl());
-//                    context.startActivity(i);
-//                    //Intent i = new Intent("");
                     Log.i("URL in adapter",cardData.get(position).getUrl());
-                    //context.sendBroadcast(i);
                 }
             });
-//            ((ViewHolder4)holder).iconImage.setImageBitmap(RetrofitClient.getImage(cardData.get(position).getImage()));
         }
     }
 
@@ -227,6 +227,7 @@ public class CardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
         }
     }
 
+    // ---------------------------------------- getFilter() - this function is used for searching through the data present on the screen ------------------------------------------------------------
     @Override
     public Filter getFilter() {
 
@@ -262,6 +263,7 @@ public class CardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
         };
     }
 
+    //EVERY CARD HAS ITS OWN VIEWHOLDER, WHENEVER A NEW CARD IS ADDED ITS VIEWHOLDER WILL BE DECLARED HERE AND ALL ITS ITEM WILL BE INITIALIZED IN IT
     public class ViewHolder1 extends RecyclerView.ViewHolder {
 
         public TextView head, sub_head, desc;

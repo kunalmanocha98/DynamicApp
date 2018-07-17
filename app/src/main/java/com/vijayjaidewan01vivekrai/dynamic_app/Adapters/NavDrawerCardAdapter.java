@@ -24,6 +24,11 @@ public class NavDrawerCardAdapter extends RecyclerView.Adapter<RecyclerView.View
    private ArrayList<Menu_items> items;
    private Context context;
 
+    /**
+     *
+     * @param items - this contains the list of the data to be displayed in the drawer
+     * @param context - Scrolling Activity context
+     */
     public NavDrawerCardAdapter(ArrayList<Menu_items> items, Context context) {
         this.items = items;
         this.context = context;
@@ -45,14 +50,14 @@ public class NavDrawerCardAdapter extends RecyclerView.Adapter<RecyclerView.View
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(((ViewHolder)holder).iconImage);
 
+        //EVERY ITEM IN THE MENU POINTS TO A SPECIFIC URL THAT URL WILL GIVE US THE NEW DATA TO LOAD THE VIEW
+        //HERE onClickSetListener IS USED TO PASS THE URL TO THE callHttp() METHOD OF SCROLLING ACTIVITY
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (onClickSetListener != null) {
-//                    db = new DatabaseHelper(context,items.get(position).getUrl(),null,1);
                     onClickSetListener.onClickFunction(items.get(position).getUrl());
                 }
-//                Toast.makeText(context, items.get(position).getUrl(), Toast.LENGTH_SHORT).show();
                 Log.i("URL in adapter", items.get(position).getUrl());
             }
         });

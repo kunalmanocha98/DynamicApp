@@ -27,11 +27,13 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -65,10 +67,12 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
     private Toolbar toolbar;
     private CoordinatorLayout coordinatorLayout;
     private AppBarLayout appBarLayout;
-    private LinearLayout linearLayout, mainLinear;
+    private LinearLayout linearLayout, mainLinear, no_internet_bar;
     private RecyclerView recyclerView;
     private SwipeRefreshLayout swipeRefreshLayout;
     private LinearLayout navigationView;
+    private FrameLayout frame;
+    private Button btn_retry;
     CardAdapter mCardAdapter;
     int searchValue = 1;
     static String BASE_URL = "http://bydegreestest.agnitioworld.com/test/mobile_app.php";
@@ -96,6 +100,8 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
         coordinatorLayout = findViewById(R.id.coordinator_layout);
         linearLayout = findViewById(R.id.linear_layout);
         appBarLayout = findViewById(R.id.app_bar);
+        frame = findViewById(R.id.frame);
+        no_internet_bar =  findViewById(R.id.no_internet_bar);
 
         /**
          *
@@ -108,6 +114,7 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
         toolbar = findViewById(R.id.toolbar);
         mToolbar = findViewById(R.id.tool_bar);
         progressBar = findViewById(R.id.progressBar);
+        btn_retry =  findViewById(R.id.btn_retry);
 
         /**
          *
@@ -117,6 +124,7 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
         mArrayList = new ArrayList<>();
         db = new DatabaseHelper(ScrollingActivity.this, "Information", null, 1);
 
+        showOfflineBar();
         //It checks if the network is available then get the data from the api, if not then retrieve it from the Database
         if (isNetworkAvailable()) {
             // notify user you are online
@@ -134,9 +142,7 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
     }
 
     //--------------------------------------------------- Offline Mode Function - It displays the data from the database, if present, else it displays offline fragment -----------------------------
-    public void offlineMode()
-    {
-        showSnackBar();
+    public void offlineMode() {
 
         TableRecord record = new TableRecord(BASE_URL);                 // TableRecord is a model which stores URL, Data, and time
         db.getRecord(record);                                           //It will fetch the data by mapping the url present in the record and then set it to the record
@@ -154,37 +160,59 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
     }
 
     //--------------------------------------------------- SnackBar Function - to display the snackBar at the top (below the status  bar) ----------------------------------------------------------
-    public void showSnackBar()
-    {
-        Snackbar snackbar = Snackbar.make(drawerLayout,"Network not available",Snackbar.LENGTH_LONG)
-                                    .setDuration(Snackbar.LENGTH_INDEFINITE)
-                                    .setAction("RETRY", new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            if(isNetworkAvailable())
-                                            {
-                                                callHttp(BASE_URL);
-                                            }
-                                            else
-                                            {
-                                                showSnackBar();
-                                            }
-                                        }
-                                    });
+    public void showOfflineBar() {
 
-        View view = snackbar.getView();
-        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)view.getLayoutParams();
-        params.gravity = Gravity.TOP;
-        params.topMargin = 50;
-        params.height = 150;
-        view.setLayoutParams(params);
+        CoordinatorLayout.LayoutParams params =  (CoordinatorLayout.LayoutParams) frame.getLayoutParams();
 
-        snackbar.show();
+        if(isNetworkAvailable())
+        {
+            params.topMargin = 0;
+            no_internet_bar.setVisibility(View.GONE);
+        }
+        else
+        {
+            params.topMargin = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,40.0f,getResources().getDisplayMetrics());   //TypedValue.complexToDimensionPixelSize(30,getResources().getDisplayMetrics())
+            no_internet_bar.setVisibility(View.VISIBLE);
+        }
+        frame.setLayoutParams(params);
+
+        btn_retry.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                callHttp(BASE_URL);
+            }
+        });
+
+//        Snackbar snackbar = Snackbar.make(frame,"Network not available",Snackbar.LENGTH_LONG)
+//                                    .setDuration(Snackbar.LENGTH_INDEFINITE)
+//                                    .setAction("RETRY", new View.OnClickListener() {
+//                                        @Override
+//                                        public void onClick(View v) {
+//                                            if(isNetworkAvailable())
+//                                            {
+//                                                callHttp(BASE_URL);
+//                                            }
+//                                            else
+//                                            {
+//                                                showSnackBar();
+//                                            }
+//                                        }
+//                                    });
+//
+//        View view = snackbar.getView();
+//        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) view.getLayoutParams();
+//        params.gravity = Gravity.TOP;
+//        params.topMargin = 50;
+//        params.height = 150;
+//        view.setLayoutParams(params);
+//
+//        snackbar.show();
+
+
     }
 
     //--------------------------------------------------- Offline Fragment Function - to replace the layout with offline fragment ---------------------------------------------------------------
     public void offlineFragment() {
-        showSnackBar();
 
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         coordinatorLayout.setVisibility(View.GONE);
@@ -200,6 +228,9 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
     //--------------------------------------------------- CallHttp function - takes the input as the URL, then fetch the data from it and pass it to the setView() to create view -----------------
     public void callHttp(final String URL) {
         BASE_URL = URL;                                                  // It is assigned to BASE_URL, so that the other function which wants to refresh the content can pass the same URL always
+
+        showOfflineBar();
+        mArrayList.clear();
         if (isNetworkAvailable()) {
             ApiService apiService = ApiUtils.getAPIService();
 
@@ -213,7 +244,6 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
                 public void onResponse(Call<TestResults> call, Response<TestResults> response) {
                     if (response.isSuccessful()) {
                         if (response.body().getMsg().equals("success")) {
-                            mArrayList.clear();
 
                             //DISAPPEAR THE PROGRESS BAR SHOWN EARLIER
                             mainLinear.setVisibility(View.VISIBLE);
@@ -231,7 +261,7 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
                             setView(results);
                         } else {
 //                            Toast.makeText(ScrollingActivity.this, response.body().getMsg(), Toast.LENGTH_SHORT).show();
-                            Log.i("Message ",response.body().getMsg());
+                            Log.i("Message ", response.body().getMsg());
                         }
                     }
                 }
@@ -246,8 +276,8 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
         }
     }
 
-    // -------------------------------------------------- Set View Function - It takes input as Results object(It stores all the attributes required to adjust the view), it segregates and assign
-    // -------------------------------------------------- it to the different variables or pass it to the different functions---------------------------------------------------------------------
+    // -------------------------------------------------- Set View Function - It takes input as Results object(It stores all the attributes required to adjust the view) ---------------------------
+    // -------------------------------------------------- it segregates and assign it to the different variables or pass it to the different functions ---------------------------------------------
     void setView(Results results) {
 
         /**
@@ -256,7 +286,6 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
          * @param collapseValue - it is used to decide whether to show a collapsing toolbar or a normal toolbar
          */
         int drawerValue = Integer.parseInt(results.getToolBar().getIs_back());
-//                        drawerValue = 1;
         int collapseValue = Integer.parseInt(results.getToolBar().getTop_image());
 
         Log.d("Collapse", "" + collapseValue);
@@ -264,8 +293,8 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
 
         /**
          *
-         * @values drawerValue = 0 => Navigation Button
-         * @values drawerValue = 1 => Back Button
+         * @value drawerValue = 0 => Navigation Button
+         * @value drawerValue = 1 => Back Button
          */
         if (drawerValue == 0)
             backUrl = null;
@@ -474,7 +503,7 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
                 @Override
                 public void onClick(View v) {
 //                    Toast.makeText(getApplicationContext(), backUrl, Toast.LENGTH_SHORT).show();
-                    Log.i("Back Url",backUrl);
+                    Log.i("Back Url", backUrl);
                     callHttp(backUrl);
                 }
             });
@@ -482,7 +511,7 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
                 @Override
                 public void onClick(View v) {
 //                    Toast.makeText(getApplicationContext(), backUrl, Toast.LENGTH_SHORT).show();
-                    Log.i("Back Url",backUrl);
+                    Log.i("Back Url", backUrl);
                     callHttp(backUrl);
                 }
             });
@@ -516,7 +545,7 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
                 super.onBackPressed();
             else {
 //                Toast.makeText(getApplicationContext(), backUrl, Toast.LENGTH_SHORT).show();
-                Log.i("On back pressed",backUrl);
+                Log.i("On back pressed", backUrl);
                 callHttp(backUrl);
             }
         }

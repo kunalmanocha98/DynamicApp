@@ -47,9 +47,9 @@ public class SetNavDrawer {
     }
 
     /**
-     *
      * @param view - gets the navigation view from the constructor
-     * @param context - gets the context of the ScrollingActivity (Because it is the single acitivity in our project)
+     * @param context - gets the context of the ScrollingActivity
+     *                (Because it is the single acitivity in our project)
      * @param db - database helper instance is passed from the Scrolling activity
      */
     public SetNavDrawer(LinearLayout view, Context context, DatabaseHelper db) {
@@ -59,11 +59,12 @@ public class SetNavDrawer {
         navDrawer = new NavDrawer();
     }
 
-    // -------------------------------------------------- getJSON() - this function fetches the data from the Internet if the client is online or from the database if it is offline --------------
+    // getJSON() - this function fetches the data from the Internet if the client is online or from the database if it is offline --------------
     public void getJSON() {
         /**
-         *
-         * @param recyclerView - the navigation drawer is set with the recycler view, so that it can be completely dynamic and more designs and flexibility can be added to it
+         * @param recyclerView - the navigation drawer is set with the recycler view,
+         *                     so that it can be completely dynamic and more designs
+         *                     and flexibility can be added to it
          * @param navHeaderImage - this displays the header image of the navigation drawer
          * @param navHeaderText - this is the text to be displayed on the Header Image
          */
@@ -109,7 +110,7 @@ public class SetNavDrawer {
 //        setDrawer();
     }
 
-    // -------------------------------------------------- setDrawer() - this function will set all the values of the navigation drawer -----------------------------------------------------------
+    // setDrawer() - this function will set all the values of the navigation drawer -----------------------------------------------------------
     public void setDrawer() {
 
         navHeaderText.setText(navDrawer.getHeader_layout().getText());
@@ -118,6 +119,7 @@ public class SetNavDrawer {
                 .load(navDrawer.getHeader_layout().getImage())
                 .placeholder(R.drawable.grey)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .crossFade()
                 .into(navHeaderImage);
 
         //HERE RECYCLER VIEW IS SET, AND AN ADAPTER IS ATTACHED TO IT.

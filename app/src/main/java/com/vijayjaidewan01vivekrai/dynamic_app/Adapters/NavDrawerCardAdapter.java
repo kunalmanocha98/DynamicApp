@@ -48,6 +48,7 @@ public class NavDrawerCardAdapter extends RecyclerView.Adapter<RecyclerView.View
         Glide.with(context)
                 .load(items.get(position).getIcon())
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .crossFade()
                 .into(((ViewHolder)holder).iconImage);
 
         //EVERY ITEM IN THE MENU POINTS TO A SPECIFIC URL THAT URL WILL GIVE US THE NEW DATA TO LOAD THE VIEW

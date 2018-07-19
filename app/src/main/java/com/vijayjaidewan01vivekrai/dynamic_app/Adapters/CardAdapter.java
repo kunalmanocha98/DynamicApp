@@ -128,6 +128,7 @@ public class CardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
                     .load(cardData.get(position).getImage())
                     .placeholder(R.drawable.grey)
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .crossFade()
                     .into(((ViewHolder2) holder).iconImage);
 
             holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -159,6 +160,7 @@ public class CardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
                     .load(cardData.get(position).getImage())
                     .placeholder(R.drawable.grey)
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .crossFade()
                     .into(((ViewHolder3) holder).iconImage);
 
             holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -189,6 +191,7 @@ public class CardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
                     .load(cardData.get(position).getImage())
                     .placeholder(R.drawable.grey)
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .crossFade()
                     .into(((ViewHolder4) holder).background);
 
             holder.itemView.setOnClickListener(new View.OnClickListener() {

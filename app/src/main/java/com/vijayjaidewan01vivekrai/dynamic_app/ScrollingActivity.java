@@ -141,14 +141,18 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
         }
     }
 
-    //--------------------------------------------------- Offline Mode Function - It displays the data from the database, if present, else it displays offline fragment -----------------------------
+    //Offline Mode Function - It displays the data from the database, if present, else it displays offline fragment -----------------------------
     public void offlineMode() {
 
-        TableRecord record = new TableRecord(BASE_URL);                 // TableRecord is a model which stores URL, Data, and time
-        db.getRecord(record);                                           //It will fetch the data by mapping the url present in the record and then set it to the record
+        // TableRecord is a model which stores URL, Data, and time
+        TableRecord record = new TableRecord(BASE_URL);
+        //It will fetch the data by mapping the url
+        // present in the record and then set it to the record
+        db.getRecord(record);
 
         /**
-         * If the Data is found then convert it into the Object of TestResults and call the setView() method to start creating the view as per the record
+         * If the Data is found then convert it into the Object of TestResults
+         * and call the setView() method to start creating the view as per the record
          * If the data is not found then replace the view with Offline fragment
          */
         if (record.getData() != null) {
@@ -159,7 +163,7 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
         }
     }
 
-    //--------------------------------------------------- SnackBar Function - to display the snackBar at the top (below the status  bar) ----------------------------------------------------------
+    //SnackBar Function - to display the snackBar at the top (below the status  bar) ----------------------------------------------------------
     public void showOfflineBar() {
 
         CoordinatorLayout.LayoutParams params =  (CoordinatorLayout.LayoutParams) frame.getLayoutParams();
@@ -171,7 +175,7 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
         }
         else
         {
-            params.topMargin = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,40.0f,getResources().getDisplayMetrics());   //TypedValue.complexToDimensionPixelSize(30,getResources().getDisplayMetrics())
+            params.topMargin = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,40.0f,getResources().getDisplayMetrics());
             no_internet_bar.setVisibility(View.VISIBLE);
         }
         frame.setLayoutParams(params);
@@ -208,26 +212,26 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
 //
 //        snackbar.show();
 
-
     }
 
-    //--------------------------------------------------- Offline Fragment Function - to replace the layout with offline fragment ---------------------------------------------------------------
+    //Offline Fragment Function - to replace the layout with offline fragment ---------------------------------------------------------------
     public void offlineFragment() {
 
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         coordinatorLayout.setVisibility(View.GONE);
-// collapsingToolbarLayout.setVisibility(View.GONE);
         mToolbar.setVisibility(View.GONE);
-//            toolbar.setVisibility(View.GONE);
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
         ft.replace(R.id.drawer_layout, new Offline_fragment());
         ft.commit();
     }
 
-    //--------------------------------------------------- CallHttp function - takes the input as the URL, then fetch the data from it and pass it to the setView() to create view -----------------
+    //CallHttp function - takes the input as the URL, then fetch the data from it and pass it to the setView() to create view -----------------
     public void callHttp(final String URL) {
-        BASE_URL = URL;                                                  // It is assigned to BASE_URL, so that the other function which wants to refresh the content can pass the same URL always
+
+        // It is assigned to BASE_URL, so that the other function
+        // which wants to refresh the content can pass the same URL always
+        BASE_URL = URL;
 
         showOfflineBar();
         mArrayList.clear();
@@ -276,12 +280,11 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
         }
     }
 
-    // -------------------------------------------------- Set View Function - It takes input as Results object(It stores all the attributes required to adjust the view) ---------------------------
-    // -------------------------------------------------- it segregates and assign it to the different variables or pass it to the different functions ---------------------------------------------
+    // Set View Function - It takes input as Results object(It stores all the attributes required to adjust the view) ---------------------------
+    // it segregates and assign it to the different variables or pass it to the different functions ---------------------------------------------
     void setView(Results results) {
 
         /**
-         *
          * @param drawerValue - it is used to decide whether to show the back button or navigation drawer
          * @param collapseValue - it is used to decide whether to show a collapsing toolbar or a normal toolbar
          */
@@ -292,7 +295,6 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
         Log.d("Drawer", "" + drawerValue);
 
         /**
-         *
          * @value drawerValue = 0 => Navigation Button
          * @value drawerValue = 1 => Back Button
          */
@@ -308,7 +310,9 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
         int viewType = Integer.parseInt(results.getView_type());
         Log.d("View Type", "" + viewType);
 
-        //ANY viewType TILL 4 WILL HAVE THE SAME CODE, THE ADAPTER WILL BE INTIALIZED WITH DATA CAME INTO THE JSON AND THEN IT WILL BE ARRANGED IN THE RECYCLER VIEW AS PER THE viewType
+        //ANY viewType TILL 4 WILL HAVE THE SAME CODE, THE ADAPTER WILL BE INTIALIZED WITH DATA CAME INTO THE JSON
+        // AND THEN IT WILL BE ARRANGED IN THE RECYCLER VIEW AS PER THE viewType
+
         // viewType WILL DIFFERENTIATE BETWEEN THE FOUR CARDS CREATED, WHICH ONE SHOULD BE CHOSEN
         switch (viewType) {
             case 1:
@@ -337,7 +341,7 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
         }
     }
 
-    //--------------------------------------------------- Is Network Available Function - It will check whether there is the Internet connectivity present and returns a boolean -----------------
+    // Is Network Available Function - It will check whether there is the Internet connectivity present and returns a boolean -----------------
     private boolean isNetworkAvailable() {
         ConnectivityManager manager = (ConnectivityManager)
                 getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -349,7 +353,7 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
         return isAvailable;
     }
 
-    //--------------------------------------------------- Web View Function - It will replace the drawerLayout with webView Fragment for viewType = 5 ---------------------------------------------
+    //Web View Function - It will replace the drawerLayout with webView Fragment for viewType = 5 ---------------------------------------------
     public void webView(String url) {
         WebViewFragment webViewFragment = new WebViewFragment();
         Bundle bundle = new Bundle();
@@ -361,11 +365,10 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
         ft.commit();
     }
 
-    // -------------------------------------------------- Set Collapse Function - this function deals with the toolbar and its different attributes -----------------------------------------------
+    // Set Collapse Function - this function deals with the toolbar and its different attributes -----------------------------------------------
     private void setCollapse(int collapseValue, Results results) {
 
         /**
-         *
          * @value collapseValue = 1 => Normal toolbar
          * @value collapseValue = 2 => Collapsing toolbar
          */
@@ -415,14 +418,10 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
             AppCompatImageView background = findViewById(R.id.backImage);
             Glide.with(ScrollingActivity.this)
                     .load(results.getToolBar().getTop_image_bg())
-                    .asBitmap()
+                    .placeholder(R.drawable.grey)
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .into(new BitmapImageViewTarget(background) {
-                        @Override
-                        protected void setResource(Bitmap resource) {
-                            super.setResource(resource);
-                        }
-                    });
+                    .crossFade()
+                    .into(background);
         }
 
         swipeRefreshLayout.setProgressBackgroundColorSchemeColor(Color.WHITE);
@@ -449,7 +448,7 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
         setRecyclerView(col, orientation);
     }
 
-    // -------------------------------------------------- Set RecyclerView - this function manages the layout of the recyclerView -----------------------------------------------------------------
+    // Set RecyclerView - this function manages the layout of the recyclerView -----------------------------------------------------------------
     private void setRecyclerView(int columns, int orientation) {
         // Setting the recycler view
         recyclerView.setHasFixedSize(true);
@@ -472,7 +471,7 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
         }
     }
 
-    // -------------------------------------------------- Set Navigation - this function checks the value of drawerValue and acts accordingly -----------------------------------------------------
+    // Set Navigation - this function checks the value of drawerValue and acts accordingly -----------------------------------------------------
     private void setNavigation(int drawerValue) {
         if (drawerValue == 0) {
             backUrl = null;
@@ -518,7 +517,7 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
         }
     }
 
-    // -------------------------------------------------- Set Login - it will set the Login Fragment replacing the drawer layout for viewType = 6 -------------------------------------------------
+    // Set Login - it will set the Login Fragment replacing the drawer layout for viewType = 6 -------------------------------------------------
     private void setLogin(Login login) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -551,7 +550,8 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
         }
     }
 
-    // -------------------------------------------------- On Click Function - it is the method of OnClickSet Interface, which is used by the adapters to call and pass the url to callHttp()
+    // On Click Function - it is the method of OnClickSet Interface,
+    // which is used by the adapters to call and pass the url to callHttp()
     @Override
     public void onClickFunction(String url) {
         drawerLayout.closeDrawers();
@@ -559,7 +559,7 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
         Log.i("IN Scrolling", url);
     }
 
-    //Search Bar controlled by searchValue = 0(Not Present), 1(Present)
+    // Search Bar controlled by searchValue = 0(Not Present), 1(Present)
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -607,7 +607,7 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
         return super.onOptionsItemSelected(item);
     }
 
-    // -------------------------------------------------- SetLayout Interface - it is used to call the callHttp function from Login Fragment and Offline Fragment ---------------------------------
+    // SetLayout Interface - it is used to call the callHttp function from Login Fragment and Offline Fragment ---------------------------------
     public interface SetLayout {
         void setUrl(String url);
     }

@@ -455,6 +455,7 @@ public class ScrollingActivity extends AppCompatActivity implements OnClickSet {
         if (columns == 0)
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
         else {
+
             switch (orientation) {
                 case 1:
                     orientation = LinearLayoutManager.VERTICAL;
